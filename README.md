@@ -42,6 +42,7 @@ yarn build
 ```
 
 /*Перечисление всех возможных варинатов категорий товаров*/
+```
 enum ProductCategory {
     СategorySoft = "софт-скил",
     СategoryOther = "другое",
@@ -49,8 +50,9 @@ enum ProductCategory {
     СategoryButton = "кнопка",
     СategoryHard = "хард-скил"
 };
-
+```
 /*Интерфейс продукта*/
+```
 interface IProduct {
     id: string; /*айди товара*/
     category: ProductCategory; /*категория товара*/
@@ -60,8 +62,9 @@ interface IProduct {
     price: number | null; /*цена*/
     purchased: boolean; /*добавлен ли товар в корзину*/
 }
-
+```
 /*Интерфейс формы заказа*/
+```
 interface IOrder {
     products: string[];
     paymentType: string;
@@ -70,8 +73,10 @@ interface IOrder {
     phone: string;
     totalPrice: number;
 }
+```
 
 /*Интерфейс хранения данных пользователя и методы сайта*/
+```
 interface IPersonalAccount {
     shop: Product[]; /*картчоки товаров на главной*/
     basket: Product[]; /*корзина пользователя*/
@@ -85,8 +90,9 @@ interface IPersonalAccount {
     showTotalCost(): number; /* метод показа стоимости корзины*/
     showQuantityProduct(): number; /*метод показа количества товаров в коризне*/
 }
-
+```
 /*Класс продукта*/
+```
 class Product implements IProduct {
     id: string; /*айди товара*/
     category: ProductCategory; /*категория товара*/
@@ -96,8 +102,10 @@ class Product implements IProduct {
     price: number | null; /*цена*/
     purchased: boolean;
 }
+```
 
 /*Объект заказа пользователя*/
+```
 order: IOrder = {
     productы: = [];
     paymentType: '';
@@ -106,8 +114,10 @@ order: IOrder = {
     phone: '';
     totalPrice: number;
 }
+```
 
 /*Интерфейс хранения данных пользователя и методы сайта*/
+```
 class PersonalAccount implements IPersonalAccount {
     shop: Product[]; /*картчоки товаров на главной*/
     basket: Product[]; /*корзина пользователя*/
@@ -121,7 +131,8 @@ class PersonalAccount implements IPersonalAccount {
     showTotalCost(): number; /* метод показа стоимости корзины*/
     showQuantityProduct(): number; /*метод показа количества товаров в коризне*/
 }
-
+```
+```
 class Card implements IProduct {
     protected _title: HTMLElement;
     protected _category: HTMLElement;
@@ -137,12 +148,15 @@ class Card implements IProduct {
     set image(value: string);
     set price(value: number | null);
 }
-
-interface IBasket { /*корзина пользователя*/
+```
+/*корзина пользователя*/
+```
+interface IBasket { 
     products: ProductPurchased[];
     totalPrice: number;
 }
-
+```
+```
 class Basket implements IBasket {
     protected _products: HTMLElement;
     protected _totalPrice: HTMLElement;
@@ -150,12 +164,15 @@ class Basket implements IBasket {
     set products(items: ProductPurchased[]);
     set totalPrice(price: number);
 }
-
-interface IPage { /*главная страница*/
+```
+/*главная страница*/
+```
+interface IPage { 
     counter: number; /*количество товаров в корзине */
     shop: Product[]; /*все карточки на странице*/
 }
-
+```
+```
 class Page implements IPage {
     protected _counter: HTMLElement;
     protected _shop: HTMLElement;
@@ -163,8 +180,10 @@ class Page implements IPage {
     set counter(value: number);
     set shop(items: Product[]);
 }
+```
 
 /*события */
+```
 'basket:open' /* при нажатии на иконку корзины открывается окно в котором находятся товары которые пользователь добавил в коризну */
 'basket:order' /*при нажатии на кнопку оформить заказ открывается окно с формой для заполнения */
 'basket:delete' /* при нажатии на удаление товара удаляет товар из корзины, меняет итоговую сумму в корзине и количество товаров, меняет кнопку у товара с добавленного на недобавленный */
@@ -173,3 +192,4 @@ class Page implements IPage {
 'card:open' /*открывает полную карточку товара с опсианием */
 'order:submit' /*меняет окно формы для заполнения на следующий шаг при нажатии на кнопку далее*/
 'order:success' /*при нажатии на кнопку заказать открывается модальное окно с информацией об успешной покупке*/
+```
