@@ -41,155 +41,52 @@ npm run build
 yarn build
 ```
 
-/*Перечисление всех возможных варинатов категорий товаров*/
+## Об архитектуре 
 ```
-enum ProductCategory {
-    СategorySoft = "софт-скил",
-    СategoryOther = "другое",
-    СategoryAdditional = "дополнительное",
-    СategoryButton = "кнопка",
-    СategoryHard = "хард-скил"
-};
-```
-/*Интерфейс продукта*/
-```
-interface IProduct {
-    id: string; /*айди товара*/
-    category: ProductCategory; /*категория товара*/
-    title: string; /*название*/
-    description: string; /*описание*/
-    image: string; /*изображение*/
-    price: number | null; /*цена*/
-    purchased: boolean; /*добавлен ли товар в корзину*/
-}
-```
-/*Интерфейс формы заказа*/
-```
-interface IOrder {
-    products: string[];
-    paymentType: string;
-    address: string;
-    email: string;
-    phone: string;
-    totalPrice: number;
-}
+Взаимодействия внутри приложения происходят через события. Модели инициализируют события, слушатели событий в основном коде выполняют передачу данных компонентам отображения, а также вычислениями между этой передачей, и еще они меняют значения в моделях.
+
+Приложение построено на основе паттерна MVP (Model-View-Presenter) и состоит из трех основных слоев:
+
+Модель (Model) - отвечает за хранение и обработку данных.
+Представление (View)  - отвечает за отображение данных и взаимодействие с пользователем.
+Презентер (Presenter) - связывает Модель и Представление, обрабатывает логику приложения и реагирует на события от Представления.
 ```
 
-/*Интерфейс хранения данных пользователя и методы сайта*/
+## Базовый код 
 ```
-interface IPersonalAccount {
-    shop: Product[]; /*картчоки товаров на главной*/
-    basket: Product[]; /*корзина пользователя*/
-    order: IOrder; /*заказ пользователя*/
-    addToBasket(value: Product): void; /*метод добавления товара в корзину пользователя*/
-    deleteFromBasket(id: string): void; /*метод удаления товара из корзины пользователя*/
-    clearBasket(): void; /*метод полной очистки корзины пользователя*/
-    validateForm(): boolean; /* метод валидации формы заказа пользователя*/
-    clearOrder(): boolean; /* метод полной очистки заказа пользователя*/
-    resetpurchased(): void; /* метод обновления поля добавления в корзину товара после заверешния покупки*/
-    showTotalCost(): number; /* метод показа стоимости корзины*/
-    showQuantityProduct(): number; /*метод показа количества товаров в коризне*/
-}
+class Api отвечает за работу с сервером.
 ```
-/*Класс продукта*/
-```
-class Product implements IProduct {
-    id: string; /*айди товара*/
-    category: ProductCategory; /*категория товара*/
-    title: string; /*название*/
-    description: string; /*описание*/
-    image: string; /*изображение*/
-    price: number | null; /*цена*/
-    purchased: boolean;
-}
-```
+Конструктор класса состоит из 
+baseUrl: string URL - для доступа к API
+options: RequestInit - настройки/опции запроса
 
-/*Объект заказа пользователя*/
+Класс содержит следующие методы 
+handleResponse(response: Response): Promise<object> - обрабатывает ответ от сервера
+get(uri: string) -  получение данных с сервера
+post(uri: string, data: object, method: ApiPostMethods = 'POST') - отправка данных на сервер
 ```
-order: IOrder = {
-    productы: = [];
-    paymentType: '';
-    address: '';
-    email: '';
-    phone: '';
-    totalPrice: number;
-}
+Класс EventEmitter дает возможность компонентам подписаться на события и реагировать на их выполнение 
 ```
+Конструктор класса инициализирует хранилище событий
+Класс содержит следующие методы 
+on - позволяет установить обработчик на событие
+off - позволяет снять обработчик с события
+emit - позволяет инициировать событие с данными
+onAll - позволяет слушать все события
+offAll - позволяет сбросить все обработчики
+trigger - позволяет сделать коллбек триггер, генерирующий событие при вызове
 
-/*Интерфейс хранения данных пользователя и методы сайта*/
 ```
-class PersonalAccount implements IPersonalAccount {
-    shop: Product[]; /*картчоки товаров на главной*/
-    basket: Product[]; /*корзина пользователя*/
-    order: IOrder; /*заказ пользователя*/
-    addToBasket(value: Product): void; /*метод добавления товара в корзину пользователя*/
-    deleteFromBasket(id: string): void; /*метод удаления товара из корзины пользователя*/
-    clearBasket(): void; /*метод полной очистки корзины пользователя*/
-    validateForm(): boolean; /* метод валидации формы заказа пользователя*/
-    clearOrder(): boolean; /* метод полной очистки заказа пользователя*/
-    resetpurchased(): void; /* метод обновления поля добавления в корзину товара после заверешния покупки*/
-    showTotalCost(): number; /* метод показа стоимости корзины*/
-    showQuantityProduct(): number; /*метод показа количества товаров в коризне*/
-}
+abstract class Component абстрактный класс обеспечивает работу с DOM
 ```
-```
-class Card implements IProduct {
-    protected _title: HTMLElement;
-    protected _category: HTMLElement;
-    protected _image: HTMLImageElement;
-    protected _price: HTMLElement;
-    /*сеттеры и геттеры*/
-    set id(value: string);
-    get id(): string;
-    set title(value: string);
-    get title(): string;
-    set purchased(value: boolean);
-    set category(value: ProductCategory);
-    set image(value: string);
-    set price(value: number | null);
-}
-```
-/*корзина пользователя*/
-```
-interface IBasket { 
-    products: ProductPurchased[];
-    totalPrice: number;
-}
-```
-```
-class Basket implements IBasket {
-    protected _products: HTMLElement;
-    protected _totalPrice: HTMLElement;
-    /*сеттеры и геттеры*/
-    set products(items: ProductPurchased[]);
-    set totalPrice(price: number);
-}
-```
-/*главная страница*/
-```
-interface IPage { 
-    counter: number; /*количество товаров в корзине */
-    shop: Product[]; /*все карточки на странице*/
-}
-```
-```
-class Page implements IPage {
-    protected _counter: HTMLElement;
-    protected _shop: HTMLElement;
-    /*сеттеры и геттеры*/
-    set counter(value: number);
-    set shop(items: Product[]);
-}
-```
+constructor(protected readonly container: HTMLElement) Конструктор класса принимает DOM-элемент 
 
-/*события */
-```
-'basket:open' /* при нажатии на иконку корзины открывается окно в котором находятся товары которые пользователь добавил в коризну */
-'basket:order' /*при нажатии на кнопку оформить заказ открывается окно с формой для заполнения */
-'basket:delete' /* при нажатии на удаление товара удаляет товар из корзины, меняет итоговую сумму в корзине и количество товаров, меняет кнопку у товара с добавленного на недобавленный */
-'modal:close' /*закрывается модальное окно при нажатии на крестик или оверлей*/
-'card:addToBasket' /*при нажатии на добавление товара в коризу меняет счетчик в корзине итоговой стоимости и количества товара. Также меняет кнопку на неактивную чтобы нельзя было добавить товар еще раз*/
-'card:open' /*открывает полную карточку товара с опсианием */
-'order:submit' /*меняет окно формы для заполнения на следующий шаг при нажатии на кнопку далее*/
-'order:success' /*при нажатии на кнопку заказать открывается модальное окно с информацией об успешной покупке*/
-```
+Методы класса 
+
+toggleClass(element: HTMLElement, className: string, force?: boolean) Переключить класс
+setText(element: HTMLElement, value: unknown) Установить текстовое содержимое
+setDisabled(element: HTMLElement, state: boolean) Сменить статус блокировки
+setHidden(element: HTMLElement) Скрыть элемент
+setVisible(element: HTMLElement) Показать элемент
+setImage(element: HTMLImageElement, src: string, alt?: string) Установить изображение с алтернативным текстом
+render(data?: Partial<T>): HTMLElement Вернуть корневой DOM-элемент
