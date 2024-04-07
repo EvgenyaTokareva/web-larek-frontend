@@ -41,7 +41,7 @@ npm run build
 yarn build
 ```
 
-## Об архитектуре 
+# Об архитектуре 
 ```
 Взаимодействия внутри приложения происходят через события. Модели инициализируют события, слушатели событий в основном коде выполняют передачу данных компонентам отображения, а также вычислениями между этой передачей, и еще они меняют значения в моделях.
 
@@ -52,41 +52,243 @@ yarn build
 Презентер (Presenter) - связывает Модель и Представление, обрабатывает логику приложения и реагирует на события от Представления.
 ```
 
-## Базовый код 
-```
-class Api отвечает за работу с сервером.
-```
-Конструктор класса состоит из 
--baseUrl: string URL - для доступа к API
--options: RequestInit - настройки/опции запроса
+# Базовый код 
 
-Класс содержит следующие методы 
--handleResponse(response: Response): Promise<object> - обрабатывает ответ от сервера
--get(uri: string) -  получение данных с сервера
--post(uri: string, data: object, method: ApiPostMethods = 'POST') - отправка данных на сервер
-```
-Класс EventEmitter дает возможность компонентам подписаться на события и реагировать на их выполнение 
-```
+## class Api отвечает за работу с сервером.
+
+### Конструктор класса состоит из 
+- baseUrl: string URL для доступа к API
+- options: RequestInit настройки/опции запроса
+
+### Класс содержит следующие методы 
+- handleResponse(response: Response): Promise<object> обрабатывает ответ от сервера
+- get(uri: string) получение данных с сервера
+- post(uri: string, data: object, method: ApiPostMethods = 'POST') отправка данных на сервер
+  
+## Класс EventEmitter дает возможность компонентам подписаться на события и реагировать на их выполнение 
 Конструктор класса инициализирует хранилище событий
-Класс содержит следующие методы 
--on - позволяет установить обработчик на событие
--off - позволяет снять обработчик с события
--emit - позволяет инициировать событие с данными
--onAll - позволяет слушать все события
--offAll - позволяет сбросить все обработчики
--trigger - позволяет сделать коллбек триггер, генерирующий событие при вызове
 
+### Класс содержит следующие методы 
+- on позволяет установить обработчик на событие
+- off позволяет снять обработчик с события
+- emit позволяет инициировать событие с данными
+- onAll позволяет слушать все события
+- offAll позволяет сбросить все обработчики
+- trigger позволяет сделать коллбек триггер, генерирующий событие при вызове
+
+## abstract class Component абстрактный класс обеспечивает работу с DOM
+Конструктор класса принимает DOM-элемент constructor(protected readonly container: HTMLElement) 
+
+### Методы класса 
+- toggleClass(element: HTMLElement, className: string, force?: boolean) Переключить класс
+- setText(element: HTMLElement, value: unknown) Установить текстовое содержимое
+- setDisabled(element: HTMLElement, state: boolean) Сменить статус блокировки
+- setHidden(element: HTMLElement) Скрыть элемент
+- setVisible(element: HTMLElement) Показать элемент
+- setImage(element: HTMLImageElement, src: string, alt?: string) Установить изображение с алтернативным текстом
+- render(data?: Partial<T>): HTMLElement Вернуть корневой DOM-элемент
+  
+# Компоненты модели данных 
+
+## class ShopAPI расширяет стандартные возможности API
+### свойства класса
+- cdn(string) ссылка для загрузки изображений товаров
+
+### Конструктор класса состоит из 
+
+- cdn: string — ссылка для загрузки изображений товаров
+- baseUrl: string — базовая ссылка на API
+- options?: RequestInit — список настроек запроса
+
+### методы
+
+- getProductsList: () => Promise<IProduct[]>; /*Получить с сервера все продукты*/
+- getProductId: (id: string) => Promise<IProduct>; /*Получить определенный продукт по ID*/
+- orderProduct: (order: IOrder) => Promise<IOrderResult>; /*Отправка на сервер заказа*/
+
+### интерфейс класса
 ```
-abstract class Component абстрактный класс обеспечивает работу с DOM
+interface IShopAPI {
+- getProductsList: () => Promise<IProduct[]>; /*Получить с сервера все продукты*/
+- getProductId: (id: string) => Promise<IProduct>; /*Получить определенный продукт по ID*/
+- orderProduct: (order: IOrder) => Promise<IOrderResult>; /*Отправка на сервер заказа*/
+}
 ```
-constructor(protected readonly container: HTMLElement) Конструктор класса принимает DOM-элемент 
 
-Методы класса 
+## class personalAccount класс отражающий состояние сайта для пользователя 
 
--toggleClass(element: HTMLElement, className: string, force?: boolean) Переключить класс
--setText(element: HTMLElement, value: unknown) Установить текстовое содержимое
-setDisabled(element: HTMLElement, state: boolean) Сменить статус блокировки
-setHidden(element: HTMLElement) Скрыть элемент
-setVisible(element: HTMLElement) Показать элемент
-setImage(element: HTMLImageElement, src: string, alt?: string) Установить изображение с алтернативным текстом
-render(data?: Partial<T>): HTMLElement Вернуть корневой DOM-элемент
+### свойства класса
+- shop: IProduct[]; /*картчоки товаров на главной*/
+- basket: IProduct[]; /*корзина пользователя*/
+- preview: string  /*айди товара для открытия окна с описанием*/
+- order: IOrder | null ; /*заказ пользователя*/
+- formErrors: FormErrors  ; /*ошибки в форме заказа*/
+
+
+  ### методы класса
+- addToBasket(value: Product): void; /*метод добавления товара в корзину пользователя*/
+- deleteFromBasket(id: string): void; /*метод удаления товара из корзины пользователя*/
+- changeBasket() /*изменения состояния корзины*/
+- clearBasket(): void; /*метод полной очистки корзины пользователя*/
+- validateForm(); /* метод валидации формы заказа пользователя*/
+- updateFormErrors(errors: FormErrors) /*метод обновления ошибок форме*/
+- clearOrder(): boolean; /* метод полной очистки заказа пользователя*/
+- resetpurchased(): void; /* метод обновления поля добавления в корзину товара после заверешния покупки*/
+- showTotalCost(): number; /* метод показа стоимости корзины*/
+- showQuantityProduct(): number; /*метод показа количества товаров в корзине*/
+- сreationCatalog(shop: IProduct[]): void /*метод отоборжение карточек на главной*/
+- сreationPreview(shop: IProduct): void /*метод отображение опсиания карточки*/
+}
+
+### интерфейс класса
+```
+interface IPersonalAccount {
+- shop: IProduct[]; /*картчоки товаров на главной*/
+- basket: IProduct[]; /*корзина пользователя*/
+- preview: string /*айди товара для открытия окна с опсианием*/
+- order: IOrder | null ; /*заказ пользователя*/
+- contactsForm:IContactsForm /*форма с контактными данными*/
+- adressForm: IAdressForm /*форма с адрессом*/
+}
+```
+
+# Компоненты представления
+## class Modal для взаимодействия с модальными окнами
+### Конструктор класса:
+constructor(container: HTMLElement, protected events: IEvents) - принимает контейнер для окна и объект для управления событиями
+### методы
+- set content(value: HTMLElement) - создание содержимого модального окна
+- open() - открытие окна
+- close() - закрытие окна
+- render(data: IModalData): HTMLElement - рендер окна
+### интерфейс класса
+```
+interface IModalData {
+  content: HTMLElement; /*наполнение окна*/
+}	
+```
+## class Form для взаимодействия с формами
+### Конструктор класса:
+constructor(protected container: HTMLFormElement, protected events: IEvents) - принимает контейнер для формы и объект для управления событиями
+### методы
+- onInputChange(field: keyof T, value: string) - обработчик событий ввода
+- set valid(value: boolean) - проверка валидности формы для кнопки отправки
+- set errors(value: string) - отображает ошибки валидации формы
+- render(state: Partial<T> & IFormState) - отображает состояние формы
+### интерфейс класса
+```
+interface IFormState {
+- valid: boolean;
+- errors: string[];
+}
+```
+## class Page класс для основных элементов интерфейса страницы
+### свойства класса
+- protected _counter: HTMLElement; счетчик товаров в корзине
+- protected _catalog: HTMLElement; контейнер для каталога товаров
+- protected _wrapper: HTMLElement; обертка страницы
+- protected _basket: HTMLElement;  элемент корзины
+### конструктор класса
+constructor(container: HTMLElement, protected events: IEvents) инициализирует элементы и назначает обработчики событий
+### методы
+- set counter(value: number) счетчик товаров в корзине
+- set shop(items: HTMLElement[]) заполняет каталог товаров
+- set locked(value: boolean)  блокировка страницы
+### интерфейс класса
+```
+interface IPage {
+- counter: number; счетчик товара
+- shop: HTMLElement[]; картчоки товаров
+- locked: boolean; блокировка страницы
+}
+```
+## class Card для управления карточками товара
+### свойства класса
+- protected _title: HTMLElement; название товара
+- protected _image: HTMLImageElement; изображение товара
+- protected _description: HTMLElement; описание товара
+- protected _button: HTMLButtonElement; кнопка товара
+- protected _index: HTMLElement; индекс товара
+- protected _price: HTMLButtonElement; цена товара
+- protected _category: HTMLButtonElement; категория товара
+### конструктор класса
+constructor(protected blockName: string, container: HTMLElement, actions?: ICardActions) инициализирует элементы карточки и устанавливает обработчики событий для кнопок
+### методы
+- set/get id управляет индификатором карточки
+- set/get title управляет названием товара
+- set description устанавливает описание товара
+- set/get price управляет ценой товара
+- set image устанавливает изображение товара
+- set/get category управляет категорией и ее цветом
+### интерфейс класса
+```
+interface ICard<T> {
+title: string; название товара
+description: string | string[]; описание товара
+image: string; изображение товара
+status: T;
+price: number; цена товара
+category: string; категория товара
+}
+```
+## class Basket для управления корзиной
+### свойства класса
+- protected _list: HTMLElement; список товаров
+- protected _total: HTMLElement; общая стоимость товаров
+- protected _button: HTMLElement; кнопка перехода к оформлению заказа
+### конструктор класса
+constructor(container: HTMLElement, protected events: EventEmitter) инициализирует элементы корзины  и устанавливает обработчики событий
+### методы
+- set items(items: HTMLElement[]) устанановка данных в корзине
+- set total(total: number) устанановка общей суммы товаров в корзине
+- set selected(items: number) отключение кнопки оформления заказа если корзина пустая
+### интерфейс класса
+```
+interface IBasketView {
+    items: HTMLElement[];
+    total: number;
+    selected: string[];
+```
+
+## class AdressForm класс с элементами управления формой с выбором оплаты и адрессом
+### свойства класса
+- _buttonCard - кнопка выбора оплаты картой
+- _buttonCash - кнопка оплаты наличными
+### конструктор класса
+constructor(container: HTMLFormElement, events: IEvents, actions?: IActions) инициализирует элементы формы  и устанавливает обработчики событий
+### методы
+- toggleStateButton(target: HTMLElement) - переключение кнопки оплаты
+- set address(value: string) - установка адресса 
+### интерфейс класса
+```
+interface interface IAdressForm {
+	payment: TypePayment Способы оплаты
+	address: string Адрес доставки
+```
+
+## class ContactsForm класс с элементами управления формой с теелфоном и почтой
+### конструктор класса
+constructor(container: HTMLFormElement, events: IEvents, actions?: IActions) инициализирует элементы формы  и устанавливает обработчики событий
+### методы
+- set email(value: string) - установка почты
+- set email(value: string) - установка телефона
+### интерфейс класса
+```
+interface interface IContactsForm {
+	phone: string Способы оплаты
+	email: string Адрес доставки }
+```
+
+## class Success класс отображающий сообщение об успешной покупке
+### конструктор класса
+constructor(container: HTMLElement, actions: ISuccessActions) инициализирует элементы и устанавливает обработчики событий
+### методы
+- set total(value: string) установка информации об успешной покупке
+### интерфейс класса
+```
+interface ISuccess {
+    total: number; итоговая сумма заказа
+}
+```
+
+
