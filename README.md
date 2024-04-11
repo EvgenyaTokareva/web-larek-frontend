@@ -55,7 +55,15 @@ yarn build
 
 # Базовый код 
 
-## class Api отвечает за работу с сервером.
+## abstract class Model<T> 
+Базовая модель, чтобы можно было отличить ее от простых объектов с данными. Получает тип в виде дженерика.
+### Конструктор класса 
+constructor(data: Partial<T>, protected events: IEvents)
+### Класс содержит следующий метод
+emitChanges(event: string, payload?: object) сообщает всем, что модель поменялась
+
+## class Api 
+отвечает за работу с сервером - отправка данных на сервер, принятие ответа, получение данных с сервера. 
 
 ### Конструктор класса состоит из 
 - baseUrl: string URL для доступа к API
@@ -65,33 +73,8 @@ yarn build
 - handleResponse(response: Response): Promise<object> обрабатывает ответ от сервера
 - get(uri: string) получение данных с сервера
 - post(uri: string, data: object, method: ApiPostMethods = 'POST') отправка данных на сервер
-  
-## Класс EventEmitter дает возможность компонентам подписаться на события и реагировать на их выполнение 
-Конструктор класса инициализирует хранилище событий
 
-### Класс содержит следующие методы 
-- on позволяет установить обработчик на событие
-- off позволяет снять обработчик с события
-- emit позволяет инициировать событие с данными
-- onAll позволяет слушать все события
-- offAll позволяет сбросить все обработчики
-- trigger позволяет сделать коллбек триггер, генерирующий событие при вызове
-
-## abstract class Component абстрактный класс обеспечивает работу с DOM
-Конструктор класса принимает DOM-элемент constructor(protected readonly container: HTMLElement) 
-
-### Методы класса 
-- toggleClass(element: HTMLElement, className: string, force?: boolean) Переключить класс
-- setText(element: HTMLElement, value: unknown) Установить текстовое содержимое
-- setDisabled(element: HTMLElement, state: boolean) Сменить статус блокировки
-- setHidden(element: HTMLElement) Скрыть элемент
-- setVisible(element: HTMLElement) Показать элемент
-- setImage(element: HTMLImageElement, src: string, alt?: string) Установить изображение с алтернативным текстом
-- render(data?: Partial<T>): HTMLElement Вернуть корневой DOM-элемент
-  
-# Компоненты модели данных 
-
-## class ShopAPI расширяет стандартные возможности API
+## экземпляр класса Api ShopAPI расширяет стандартные возможности API
 ### свойства класса
 - cdn(string) ссылка для загрузки изображений товаров
 
@@ -116,10 +99,36 @@ interface IShopAPI {
 }
 ```
 
-## class personalAccount класс отражающий состояние сайта для пользователя 
+## Класс EventEmitter дает возможность компонентам подписаться на события и реагировать на их выполнение 
+Конструктор класса инициализирует хранилище событий и позволяет устанавливать, снимать слушатели.
+
+### Класс содержит следующие методы 
+- on позволяет установить обработчик на событие
+- off позволяет снять обработчик с события
+- emit позволяет инициировать событие с данными
+- onAll позволяет слушать все события
+- offAll позволяет сбросить все обработчики
+- trigger позволяет сделать коллбек триггер, генерирующий событие при вызове
+
+## abstract class Component<T> 
+Абстрактный базовый класс, предназначенным для создания компонентов пользовательского интерфейса. Класс обеспечивает инструментарий для управления DOM элементами и поведением компонента. Наследуется всеми классами представления(View), получает тип в виде дженерика.
+### Конструктор класса принимает DOM-элемент constructor(protected readonly container: HTMLElement) 
+
+### Методы класса 
+- toggleClass(element: HTMLElement, className: string, force?: boolean) Переключить класс
+- setText(element: HTMLElement, value: unknown) Установить текстовое содержимое
+- setDisabled(element: HTMLElement, state: boolean) Сменить статус блокировки
+- setHidden(element: HTMLElement) Скрыть элемент
+- setVisible(element: HTMLElement) Показать элемент
+- setImage(element: HTMLImageElement, src: string, alt?: string) Установить изображение с алтернативным текстом
+- render(data?: Partial<T>): HTMLElement Вернуть корневой DOM-элемент
+  
+
+# Компоненты модели данных 
+## class AppState класс отражающий состояние всего сайта
 
 ### свойства класса
-- shop: IProduct[]; /*картчоки товаров на главной*/
+- catalog: IProduct[]; // Каталог с товарами
 - basket: IProduct[]; /*корзина пользователя*/
 - preview: string  /*айди товара для открытия окна с описанием*/
 - order: IOrder | null ; /*заказ пользователя*/
@@ -143,7 +152,7 @@ interface IShopAPI {
 
 ### интерфейс класса
 ```
-interface IPersonalAccount {
+interface IAppState {
 - shop: IProduct[]; /*картчоки товаров на главной*/
 - basket: IProduct[]; /*корзина пользователя*/
 - preview: string /*айди товара для открытия окна с опсианием*/
