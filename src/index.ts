@@ -233,11 +233,9 @@ events.on('basket:chenge', (item: ICard) => {
 events.on('card:select', (item: ICard) => {
   const card = new Card(cloneTemplate(cardPreviewTemplate),
     events);
-  const alreadyInBasket = basket.getBasketItems().some((
-    basketItem) => {
-    const titleElement = basket.getBasketTitle(basketItem)
-    return
-    titleElement.textContent === item.title;
+  const alreadyInBasket = basket.getBasketItems().some((basketItem) => {
+    const titleElement = basket.getBasketTitle(basketItem)	
+    return titleElement.textContent == item.title;
   });
   if (alreadyInBasket || item.price === null) {
     card.disableButton();
