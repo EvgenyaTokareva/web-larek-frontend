@@ -28,8 +28,7 @@ export class Basket extends Component < IBasketView > {
     EventEmitter) {
     super(container);
     this._list = this.container.querySelector('.basket__list');
-    this._totalElement = this.container.querySelector(
-      '.basket__price');
+    this._totalElement = this.container.querySelector('.basket__price');
     this._button = this.container.querySelector('.basket__button');
     this.setDisabled(this._button, true);
     if (this._button) {
@@ -49,14 +48,18 @@ export class Basket extends Component < IBasketView > {
   getBasketItems() {
     return this._basketItems;
   }
-  getBasketIndex(basketItem: HTMLElement) {
-    const element = basketItem.querySelector('.basket__item-index');
-    return element;
-  }
-  getBasketTitle(basketItem: HTMLElement) {
+
+  basketIndex(item: HTMLElement, index:string) {
+    const element = item.querySelector('.basket__item-index') as HTMLElement;
+    const value = parseInt(index) + 1;
+    this.setText(element, value);
+   }
+  
+  getBasketTitle(basketItem: HTMLElement, item: ICard) {
     const element = basketItem.querySelector('.card__title');
-    return element;
+	return element.textContent === item.title;
   }
+  
   addItem(item: HTMLElement) {
     this._basketItems.push(item);
     this.updateButtonState();
@@ -65,6 +68,7 @@ export class Basket extends Component < IBasketView > {
     this._basketItems = [];
     this.total = '0';
   }
+  
   render(data: Partial < IBasketView > ): HTMLElement {
     if (data.items) {
       this.items = data.items;
