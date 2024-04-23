@@ -72,11 +72,12 @@ export class Card extends Component < ICard > {
 			categoryCard[value.toLowerCase()]
 		}`;
   }
+  
   set description(value: string) {
     this.setText(this._description, value);
   }
   disableButton() {
-    this._button.setAttribute('disabled', 'disabled');
+  this.setDisabled(this._button, true);
     this.setText(this._button, "Уже в корзине")
   }
 }
