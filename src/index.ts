@@ -199,7 +199,7 @@ events.on('basket:remove', (item: HTMLElement) => {
     basket.updateButtonState();
   }
 });
-events.on('basket:chenge', (item: ICard) => {
+events.on('basket:chenge', (item: ICard) => {	
   const titleElement = item.title;
   const removedItemId = appData.order.items.findIndex(
     (orderItemId) => {
@@ -217,11 +217,9 @@ events.on('basket:chenge', (item: ICard) => {
   }
   basket.total = (parseFloat(basket.total) - priceNumber).toString();
   basket.getBasketItems().forEach(
-    (basketItem, index) => {
-      const indexElement = basket.getBasketIndex(basketItem);
-      console.log(indexElement)
-      indexElement.textContent = (index + 1).toString();
-    });
+(basketItem, index) => {
+basket.basketIndex(basketItem, index.toString());
+});
   modal.render({
     content: basket.render({
       items: basket.getBasketItems(),
@@ -234,8 +232,7 @@ events.on('card:select', (item: ICard) => {
   const card = new Card(cloneTemplate(cardPreviewTemplate),
     events);
   const alreadyInBasket = basket.getBasketItems().some((basketItem) => {
-    const titleElement = basket.getBasketTitle(basketItem)	
-    return titleElement.textContent == item.title;
+  return basket.getBasketTitle(basketItem, item);	
   });
   if (alreadyInBasket || item.price === null) {
     card.disableButton();
